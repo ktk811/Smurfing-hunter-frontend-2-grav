@@ -5,3 +5,4 @@ torch-geometric
 networkx
 numpy
 pandas
+gunicorn
