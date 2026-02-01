@@ -132,10 +132,14 @@ function renderDashboard() {
                     </span>
                 </td>
                 <td style="text-transform: capitalize;">${primaryPattern}</td>
-                <td>
-                    <button class="btn btn-secondary" style="padding: 6px 14px; font-size: 0.8125rem;"
+                <td style="display: flex; gap: 8px;">
+                    <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.75rem;"
                             onclick="event.stopPropagation(); investigateWallet('${wallet.id}')">
                         View
+                    </button>
+                    <button class="btn" style="padding: 6px 12px; font-size: 0.75rem; background-color: #ef4444; color: white; border: none; cursor: pointer;"
+                            onclick="event.stopPropagation(); this.innerText = 'Banned'; this.disabled = true; this.style.opacity = '0.6';">
+                        Ban
                     </button>
                 </td>
             </tr>
