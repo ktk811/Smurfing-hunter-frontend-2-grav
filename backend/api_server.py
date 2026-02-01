@@ -1,6 +1,17 @@
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
-from models.gnn_model import ModelManager
+import sys
+import os
+
+# Ensure backend directory is in sys.path so 'models' module can be found
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
+try:
+    from models.gnn_model import ModelManager
+except ImportError:
+    # Fallback/Debug if path issue persists
+    from backend.models.gnn_model import ModelManager
+
 import datetime
 import random
 import math
