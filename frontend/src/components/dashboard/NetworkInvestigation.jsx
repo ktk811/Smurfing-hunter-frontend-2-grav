@@ -4,7 +4,7 @@ import { getEgoGraph } from '../../services/api';
 import { ZoomIn, ZoomOut, Maximize, RefreshCcw } from 'lucide-react';
 import * as d3 from 'd3';
 
-export default function NetworkInvestigation({ centerNode }) {
+export default function NetworkInvestigation({ centerNode, onNodeClick }) {
     const [data, setData] = useState({ nodes: [], links: [] });
     const graphRef = useRef();
     const wrapperRef = useRef(null);
@@ -31,13 +31,13 @@ export default function NetworkInvestigation({ centerNode }) {
     useEffect(() => {
         if (graphRef.current) {
             // ORGANIC TREE PHYSICS
-            // 1. Collide: Prevent overlap
-            graphRef.current.d3Force('collide', d3.forceCollide().radius(node => (node.val || 5) * 2));
+            // 1. Collide: Prevent overlap (Standard)
+            graphRef.current.d3Force('collide', d3.forceCollide().radius(node => (node.val || 5) * 1.5));
 
-            // 2. Charge: Strong Repulsion (Spread out for labels)
-            graphRef.current.d3Force('charge', d3.forceManyBody().strength(-300));
+            // 2. Charge: Strong Repulsion (Matches visual spread)
+            graphRef.current.d3Force('charge', d3.forceManyBody().strength(-500));
 
-            // 3. Link: Longer distance for numbers to fit
+            // 3. Link force managed via prop `linkDistance` to preserve data binding
             graphRef.current.d3Force('link', d3.forceLink().distance(80));
 
             // 4. Center: Keep it in the middle
@@ -59,10 +59,12 @@ export default function NetworkInvestigation({ centerNode }) {
                 {dimensions.width > 0 && (
                     <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>
                         <ForceGraph2D
+                            key={centerNode ? centerNode.address : 'graph'}
                             ref={graphRef}
                             graphData={data}
                             width={dimensions.width}
                             height={dimensions.height}
+                            onNodeClick={onNodeClick}
 
                             // No DAG -> Organic Shape
                             dagMode={null}
@@ -98,42 +100,35 @@ export default function NetworkInvestigation({ centerNode }) {
 
                             // LINKS
                             linkWidth={1.5}
+                            linkDistance={80}
                             linkColor={() => '#475569'}
                             linkDirectionalArrowLength={3.5}
                             linkDirectionalArrowRelPos={1}
-
-                            // LINK LABELS (Numbers)
                             linkCanvasObject={(link, ctx, globalScale) => {
-                                const start = link.source;
-                                const end = link.target;
-
                                 // Draw Line
                                 ctx.beginPath();
-                                ctx.moveTo(start.x, start.y);
-                                ctx.lineTo(end.x, end.y);
+                                ctx.moveTo(link.source.x, link.source.y);
+                                ctx.lineTo(link.target.x, link.target.y);
                                 ctx.strokeStyle = '#475569';
-                                ctx.lineWidth = 1.5 / globalScale;
+                                ctx.lineWidth = 1.5;
                                 ctx.stroke();
 
-                                // Draw Label
+                                // Draw Label (Amount)
                                 if (link.amount) {
-                                    const textPos = Object.assign({}, ...['x', 'y'].map(c => ({
-                                        [c]: start[c] + (end[c] - start[c]) * 0.5 // Center
-                                    })));
+                                    const mx = (link.source.x + link.target.x) / 2;
+                                    const my = (link.source.y + link.target.y) / 2;
 
-                                    const fontSize = 10 / globalScale;
-                                    ctx.font = `bold ${fontSize}px Sans-Serif`;
+                                    ctx.font = `${10 / globalScale}px Sans-Serif`;
                                     ctx.fillStyle = 'white';
                                     ctx.textAlign = 'center';
                                     ctx.textBaseline = 'middle';
-                                    ctx.fillText(link.amount, textPos.x, textPos.y);
+                                    ctx.fillText(link.amount, mx, my);
                                 }
                             }}
-                            linkCanvasObjectMode={() => 'replace'}
+
+                            // PHYSICS (Defaults let it settle naturally)
 
                             backgroundColor="#050505"
-
-                            cooldownTicks={100}
                             onEngineStop={() => graphRef.current.zoomToFit(400, 80)}
                         />
                     </div>

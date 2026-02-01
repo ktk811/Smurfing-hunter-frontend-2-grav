@@ -109,7 +109,12 @@ export default function FlowAnalysis({ centerNode }) {
         return "#ef4444"; // Red (Mules)
     };
 
-    if (!centerNode) return <div className="empty-state">Select a subject</div>;
+    if (!centerNode) return (
+        <div className="empty-state" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#64748b', fontSize: '1.2rem', flexDirection: 'column', gap: '1rem' }}>
+            <div style={{ padding: '1rem', border: '1px dashed #333', borderRadius: '50%' }}>🌊</div>
+            Select a subject to trace flow
+        </div>
+    );
 
     return (
         <div className="viz-container" style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: '600px', background: '#050505', borderRadius: '12px', border: '1px solid #222', overflow: 'hidden' }}>

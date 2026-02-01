@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: 'https://smurfing-hunter-frontend-grav-2.onrender.com/api',
+    baseURL: 'http://127.0.0.1:5000/api',
 });
 
 export const MAX_SCREENSHOT_HEIGHT_PX = 800;
